@@ -5,70 +5,66 @@ course: CSCI6651 Introduction to Python Programming
 Git Repository: https://github.com/katragaddanikhitha/Python_projects
 
 '''
-cipher_text = "L#dp#kdylqj#d#juhdw#wlph#lq#FVFL/9984$##Surihvvru#Dqwrqhwwl#lv#d#Frrs#Ndw$"
+def main():
+    # Given cipher text
+    cipher_text = "L#dp#kdylqj#d#juhdw#wlph#lq#FVFL/9984$##Surihvvru#Dqwrqhwwl#lv#d#Frrs#Ndw$"
 
-# Creating frequency analysis dictionary
-frequency = {}
+    # Convert to lowercase for frequency analysis
+    text_lower = cipher_text.lower()
 
-for char in cipher_text:
-    if char != " ":  #To ignore blank spaces
-        if char in frequency:
-            frequency[char] = frequency[char] + 1
-        else:
-            frequency[char] = 1
+    # Step 1: Count frequency manually
+    freq_list = []
+    for ch in text_lower:
+        found = False
+        for pair in freq_list:
+            if pair[0] == ch:
+                pair[1] += 1
+                found = True
+                break
+        if not found:
+            freq_list.append([ch, 1])
 
-# Converting frequency dictionary to list of tuples for better readability
-freq_list = []
-for letter in frequency:
-# Appending tuples of (character, count) to the list
-    freq_list.append((letter, frequency[letter]))
+    # Step 2: Convert list of lists to list of tuples
+    freq_list = [(pair[0], pair[1]) for pair in freq_list]
 
-print("Frequency Analysis (character, count):")
-print(freq_list)
-print("-" * 50)
+    # Step 3: Sort frequency descending by count
+    n = len(freq_list)
+    for i in range(n - 1):
+        for j in range(i + 1, n):
+            if freq_list[j][1] > freq_list[i][1]:
+                freq_list[i], freq_list[j] = freq_list[j], freq_list[i]
 
-# created a function to decrypt the cipher text using Caesar Cipher decryption method
-def caesar_decrypt(text, shift):
-    result = ""
+    # Step 4: Display frequency analysis
+    print(f"\nCipher Text = {cipher_text}")
+    print(f"\nCharacter Frequency Analysis (character, count):")
+    for ch, count in freq_list:
+        display_char = "Space" if ch == " " else ch
+        print(f"{display_char} count: {count}")
+    print("-" * 50)
 
-# Lists of uppercase and lowercase letters
-    uppercase = ['A','B','C','D','E','F','G','H','I','J','K','L','M',
-                 'N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
-    lowercase = ['a','b','c','d','e','f','g','h','i','j','k','l','m',
-                 'n','o','p','q','r','s','t','u','v','w','x','y','z']
+    # Step 5: Try all Caesar Cipher shifts (brute-force)
+    print("\nTrying all Caesar Cipher shifts:")
+    for shift in range(26):
+        result = ""  # Store decrypted result for this shift
 
-    for char in text:
-        # Checks if a char is  uppercase
-        if char in uppercase:
-            # Find the position of the alphabet
-            pos = 0
-            while pos < 26:
-                if uppercase[pos] == char:
-                    break
-                pos = pos + 1
+        # Lists of uppercase and lowercase letters
+        uppercase_letters = [chr(i) for i in range(65, 91)]
+        lowercase_letters = [chr(i) for i in range(97, 123)]
 
-            # Perform the shift
-            new_pos = (pos - shift) % 26
-            result = result + uppercase[new_pos]
+        # Decrypt character by character
+        for char in cipher_text:
+            if char in uppercase_letters:
+                pos = uppercase_letters.index(char)
+                new_pos = (pos - shift) % 26
+                result += uppercase_letters[new_pos]
+            elif char in lowercase_letters:
+                pos = lowercase_letters.index(char)
+                new_pos = (pos - shift) % 26
+                result += lowercase_letters[new_pos]
+            else:
+                result += char  # Keep symbols/numbers unchanged
 
-        # Check if a char is lowercase
-        elif char in lowercase:
-            pos = 0
-            while pos < 26:
-                if lowercase[pos] == char:
-                    break
-                pos = pos + 1
+        print(f"Shift {shift}: {result}")
 
-            new_pos = (pos - shift) % 26
-            result = result + lowercase[new_pos]
-
-        else:
-            # Non-alphabetic characters are added unchanged
-            result = result + char
-
-    return result
-
-# Trying all possible shifts from 0 to 25
-print("Trying all Caesar Cipher shifts:")
-for shift in range(26):
-    print("Shift", shift, ":", caesar_decrypt(cipher_text, shift))
+if __name__ == "__main__":
+    main()
